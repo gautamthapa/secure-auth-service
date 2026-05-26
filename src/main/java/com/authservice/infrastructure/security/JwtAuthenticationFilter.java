@@ -19,22 +19,23 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final CustomUserDetailsService customUserDetailsService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-      String authHeader = request.getHeader("Authorization");
-      if(authHeader == null && !authHeader.startsWith("Bearer ")) {
-          filterChain.doFilter(request, response);
-          return;
-      }
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-      String token=authHeader.substring(7);
-      if (!jwtProvider.validateToken(token)) {
-          filterChain.doFilter(request, response);
-          return;
-      }
+        String token = authHeader.substring(7);
+        if (!jwtProvider.validateToken(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-      String email = jwtProvider.extractEmailFromToken(token);
-      UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+        String email = jwtProvider.extractEmailFromToken(token);
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
                         userDetails,
