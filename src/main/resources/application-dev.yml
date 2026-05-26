@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: secure-auth-service
+
+
+jwt:
+  secret: your-super-secure-secret-key-minimum-32-characters
+  expiration: 900000
