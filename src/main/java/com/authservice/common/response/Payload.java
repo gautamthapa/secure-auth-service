@@ -23,6 +23,12 @@ public class Payload<T> implements ApiResponse {
         return payload;
     }
 
+    public static <T> Payload<T> success(String message) {
+        Payload<T> payload = new Payload<>();
+        payload.setMessage(message);
+        return payload;
+    }
+
     public static <T> Payload<T> success(T data, String message) {
         Payload<T> payload = new Payload<>();
         payload.setData(data);

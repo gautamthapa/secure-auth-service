@@ -1,9 +1,11 @@
 package com.authservice.api.controller;
 
 import com.authservice.application.dto.LoginRequest;
+import com.authservice.application.dto.RefreshRequest;
 import com.authservice.application.dto.SignupRequest;
 import com.authservice.application.service.AuthService;
 import com.authservice.common.response.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +24,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ApiResponse login(@RequestBody LoginRequest loginRequest) {
-        return authService.login(loginRequest);
+    public ApiResponse login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+        return authService.login(loginRequest, request);
     }
+
+    @PostMapping("/refresh")
+    public ApiResponse refreshToken(@RequestBody RefreshRequest refreshRequest, HttpServletRequest request) {
+        return authService.refreshToken(refreshRequest, request);
+    }
+
+    @PostMapping("/logout")
+    public ApiResponse logout(@RequestBody RefreshRequest refreshRequest) {
+        return authService.logout(refreshRequest);
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.authservice.infrastructure.entity;
 
+import com.authservice.common.enums.RoleType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,6 +34,9 @@ public class UserEntity {
 
     @Column(nullable = false)
     private Boolean locked;
+
+    @Enumerated(EnumType.STRING)
+    private RoleType role = RoleType.USER;
 
     @CreationTimestamp
     @Column(nullable = false)

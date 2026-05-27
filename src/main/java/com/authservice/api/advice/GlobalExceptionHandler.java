@@ -4,10 +4,12 @@ import com.authservice.common.exception.ApiServiceException;
 import com.authservice.common.exception.ServiceExceptionCodes;
 import com.authservice.common.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -17,6 +19,7 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
 
+        log.error("Exception caught in GlobalExceptionHandler handleApiServiceException ", ex);
         ServiceExceptionCodes error = ex.getErrorCode();
 
         ErrorResponse response = new ErrorResponse(
@@ -36,6 +39,8 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request
     ) {
+
+        log.error("Exception caught in GlobalExceptionHandler handleException", ex);
 
         ErrorResponse response = new ErrorResponse(
                 ServiceExceptionCodes.INTERNAL_ERROR.getCode(),

@@ -7,6 +7,8 @@ import com.authservice.infrastructure.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.Date;
 
@@ -14,21 +16,37 @@ import java.util.Date;
 @Component
 public class JwtProvider {
     private final Algorithm algorithm;
-    private final long jwtExpiration;
+    private final long accessExpiration;
+    private final long refreshExpiration;
 
-    public JwtProvider(@Value("${jwt.secret}") String secret,
-                       @Value("${jwt.expiration}") long jwtExpiration) {
-        this.algorithm = Algorithm.HMAC256(secret);
-        this.jwtExpiration = jwtExpiration;
+    public JwtProvider(RsaKeyProvider rsaKeyProvider, @Value("${jwt.secret}") String secret,
+                       @Value("${jwt.expiration}") long accessExpiration,
+                       @Value("${jwt.refresh-expiration}") long refreshExpiration) {
+        this.algorithm = Algorithm.RSA256(
+                (RSAPublicKey) rsaKeyProvider.getPublicKey(), (RSAPrivateKey) rsaKeyProvider.getPrivateKey()
+        );
+        this.accessExpiration = accessExpiration;
+        this.refreshExpiration = refreshExpiration;
     }
 
     public String generateToken(UserEntity user) {
         return JWT.create()
                 .withSubject(user.getEmail())
                 .withClaim("userId", user.getId())
-                .withClaim("role", "USER")
+                .withClaim("role", user.getRole().name())
                 .withIssuedAt(Date.from(Instant.now()))
-                .withExpiresAt(Date.from(Instant.now().plusSeconds(jwtExpiration)))
+                .withExpiresAt(Date.from(Instant.now().plusSeconds(accessExpiration)))
+                .sign(algorithm);
+    }
+
+    public String generateRefreshToken(UserEntity user) {
+        return JWT.create()
+                .withSubject(user.getEmail())
+                .withClaim("userId", user.getId())
+                .withClaim("role", "USER")
+                .withClaim("type", "REFRESH")
+                .withIssuedAt(Date.from(Instant.now()))
+                .withExpiresAt(Date.from(Instant.now().plusSeconds(refreshExpiration)))
                 .sign(algorithm);
     }
 

@@ -24,12 +24,31 @@ public class RefreshTokenEntity {
     private Long userId;
 
     @Column(nullable = false, unique = true, length = 512)
-    private String token;
+    private String refreshTokenHash;
+
+    private String deviceId;
+
+    private String ipAddress;
+
+    @Column(length = 1000)
+    private String userAgent;
+
+    private Instant createdAt = Instant.now();
+
+    private Instant lastUsedAt = Instant.now();
 
     @Column(nullable = false)
     private Instant expiresAt;
 
     @Column(nullable = false)
     private Boolean revoked;
+
+    public boolean isExpired() {
+        return expiresAt.isBefore(Instant.now());
+    }
+
+    public boolean isActive() {
+        return !revoked || !isExpired();
+    }
 
 }
